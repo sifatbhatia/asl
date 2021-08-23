@@ -1,0 +1,20 @@
+{% extends 'layouts/_default.twig' %}
+
+{% block main_content %}
+    <ul>
+        {% for  quiz in quizzes %}
+            <li>
+                {{ quiz.name }} -
+                <a href="/quizzes/{{ quiz.id }}/edit">Edit</a>
+                    |
+                <a href="/quizzes/{{ quiz.id }}/delete">Delete</a>
+
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="/quizzes/new">Create new quiz</a>
+    |
+    <a href="/">Go Back</a>
+    |
+    <a href="/quizzes">Refresh</a>
+{% endblock %}

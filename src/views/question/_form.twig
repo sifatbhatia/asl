@@ -1,0 +1,17 @@
+{% if question %}
+
+    <form action="/questions/{{ question.id }}" method="post">
+        {% else %}
+        <form action="/questions" method="post">
+            {% endif %}
+        <div>
+            <label for="question">question: </label>
+            {% if question %}
+                <input type="text" name="question" value="{{ question.question }}"/>
+            {% else  %}
+            <input type="text" name="question" />
+            {% endif %}
+        </div>
+        <input type="submit" value="Save Question" />
+
+    </form>

@@ -1,0 +1,17 @@
+{% if choice %}
+
+    <form action="/choices/{{ choice.id }}" method="post">
+        {% else %}
+        <form action="/choices" method="post">
+            {% endif %}
+        <div>
+            <label for="choice">Name: </label>
+            {% if choice %}
+                <input type="text" name="choice" value="{{ choice.choice }}"/>
+            {% else  %}
+            <input type="text" name="choice" />
+            {% endif %}
+        </div>
+        <input type="submit" value="Save Choice" />
+
+    </form>

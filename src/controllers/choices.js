@@ -1,47 +1,79 @@
 const express = require('express');
 const choiceCtlr = express.Router();
 const { Question, Quiz, Choice } = require('../models')
+const { isAuth } = require('../middlewares/auth')
 
 
-choiceCtlr.get('/',async (req, res) => {
-    let choice = await Choice.findAll({
-        include: Quiz
-    })
-    
-    res.json(choice)
+choiceCtlr.get('/',isAuth,async (req, res) => {
+    let choice = await Choice.findAll()
+    if (req.headers.accept.indexOf('/json') > -1) {
+        res.json(choice)
+    } else {
+        res.render('choice/index', {choice})
     }
-)
-choiceCtlr.post('/',async (req,res)=>{
+})
+choiceCtlr.get('/new', (req,res) => {
+    res.render('choice/create')
+})
+choiceCtlr.post('/',isAuth,async (req,res)=>{
     const choice = await Choice.create(req.body)
     let quiz = await Quiz.findAll()
     quiz = quiz.shift()
     choice.addQuiz(quiz)
-    res.json(choice)
+
+
+    if (req.headers.accept.indexOf('/json') > -1) {
+        res.json(choice)
+    } else {
+        res.redirect("/choices/" + choice.id)
+    }
 })
 
-choiceCtlr.get('/:id', async (req, res) => {
+choiceCtlr.get('/:id', isAuth,async (req, res) => {
     const id = Number(req.params.id)
     const choice = await Choice.findByPk( id,{
         include: Quiz
     })
-    res.json(choice)
-})
+    if (req.headers.accept.indexOf('/json') > -1) {
+        res.json(choice)
+    } else {
+        res.render('choice/show', { choice })
+    }
 
-choiceCtlr.post('/:id', async (req, res) => {
+})
+choiceCtlr.get('/:id/edit', isAuth,async (req, res) => {
     const id = Number(req.params.id)
-    var choice = await Choice.update( req.body,{
-        where:{ id: id}
+    const choice = await Choice.findByPk( id,{
+        include: Quiz
     })
-    var choice = await Quiz.findByPk( id)
-    res.json(choice)
+    res.render("choice/edit", { choice })
 })
 
-choiceCtlr.delete('/:id', async (req, res) => {
+
+choiceCtlr.post('/:id', isAuth,async (req, res) => {
+    const { id } = req.params
+    const {choice} = req.body
+    const choices = await Choice.update({choice}, {
+        where: { id }
+    })
+
+    if (req.headers.accept.indexOf('/json') > -1) {
+        res.json(choices)
+    } else {
+        res.redirect("/choices/" + id)
+    }
+})
+
+choiceCtlr.get('/:id/delete', isAuth,async (req, res) => {
     const id = Number(req.params.id)
     var deleted = await Choice.destroy( {
         where:{ id: id}
     })
-    res.json(deleted)
+    if (req.headers.accept.indexOf('/json') > -1) {
+        res.json({"success" : deleted})
+    } else {
+        res.redirect('/choices')
+    }
     
 })
 
